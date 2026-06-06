@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<!-- Copyright (C) 2026 The PharosVPN Authors -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- A dark, edge-to-edge base theme. The real palette is the Compose
+         Material3 theme (Theme.kt); this only governs the splash window so the
+         app opens onto the deep-ocean background, not a white flash. -->
+    <style name="Theme.Caravel" parent="android:Theme.Material.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">@color/ocean</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

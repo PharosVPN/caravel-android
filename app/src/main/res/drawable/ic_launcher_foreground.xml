@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<!-- Copyright (C) 2026 The PharosVPN Authors -->
+<!-- The cream Pharos beacon mark, ported from caravel-mac/.assets/icon.svg.
+     The original paths are in a 1024x1024 space; the group scales them into the
+     adaptive-icon 72x72 safe zone (scale 72/1024 = 0.0703125) and offsets by 18. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:scaleX="0.0703125"
+        android:scaleY="0.0703125"
+        android:translateX="18"
+        android:translateY="18">
+        <path
+            android:fillColor="#F4EBDD"
+            android:pathData="M512,208C644,208 759,258 830,336V500C830,654 695,785 512,842C329,785 194,654 194,500V336C265,258 380,208 512,208ZM512,266C397,266 296,306 236,368V500C236,624 347,733 512,786C677,733 788,624 788,500V368C728,306 627,266 512,266Z" />
+        <path
+            android:fillColor="#F4EBDD"
+            android:pathData="M486,170H538L558,502H466L486,170Z" />
+        <path
+            android:fillColor="#F4EBDD"
+            android:pathData="M476,618H548L538,760H486L476,618Z" />
+        <path
+            android:fillColor="#F4EBDD"
+            android:pathData="M278,356C336,309 421,280 512,280C603,280 688,309 746,356V414C680,361 602,334 512,334C422,334 344,361 278,414V356Z" />
+        <path
+            android:fillColor="#F4EBDD"
+            android:pathData="M308,452C361,407 432,382 512,382C592,382 663,407 716,452L684,506C640,468 582,448 512,448C442,448 384,468 340,506L308,452Z" />
+        <path
+            android:fillColor="#F4EBDD"
+            android:pathData="M370,552C407,514 456,494 512,494C568,494 617,514 654,552L622,606C592,581 556,568 512,568C468,568 432,581 402,606L370,552Z" />
+        <path
+            android:fillColor="#F4EBDD"
+            android:pathData="M330,632C379,679 440,704 512,704C584,704 645,679 694,632L724,686C670,740 595,772 512,772C429,772 354,740 300,686L330,632Z" />
+        <path
+            android:fillColor="#F4EBDD"
+            android:pathData="M512,464 A48,48 0 1,0 512,560 A48,48 0 1,0 512,464 Z" />
+        <path
+            android:fillColor="#5A1F2B"
+            android:pathData="M512,494 A18,18 0 1,0 512,530 A18,18 0 1,0 512,494 Z" />
+    </group>
+</vector>

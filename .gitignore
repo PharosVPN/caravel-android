@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: Apache-2.0
+
+# Android / Gradle
+.gradle/
+build/
+*/build/
+local.properties
+.idea/
+*.iml
+captures/
+.externalNativeBuild/
+.cxx/
+
+# The gomobile-built Go engine is a rebuildable artifact (see NOTES.md): build it
+# with `caravel/build-bindings.sh android` and drop it in app/libs/.
+app/libs/*.aar
+
+# OS
+.DS_Store

@@ -12,30 +12,45 @@ PharosVPN mobile client — Android implementation in Kotlin.
 
 ## Architecture
 
-Shared Go core (via `gomobile`) + native Kotlin UI.
+Shared Go core (via `gomobile`) + native Kotlin / Jetpack Compose UI. Mirrors the
+macOS client (`caravel-mac`) in features and polish.
 
-- `go/` — shared core (VPN engine, profile store, gRPC sync, crypto) — *to be symlinked from coxswain repo or as a submodule*
-- `app/` — Android app (Jetpack Compose, Keystore integration)
-- `build.gradle`, `settings.gradle` — Gradle build config
-
-## Milestones (C1–C7)
-
-See [`docs/BUILD.md`](https://github.com/PharosVPN/docs/blob/main/BUILD.md) caravel section:
-- **C1:** Skeleton, validate gomobile architecture, VPN permission plumbing
-- **C2:** Local profile store + `.pharos` parsing
-- **C3:** VPN engine (AmneziaWG, then XRay) + protocol registry
-- **C4:** Sources (file import, QR, self-contained QR)
-- **C5:** Account sync (enrollment, gRPC, E2E decrypt, multi-device)
-- **C6:** MDM managed config + posture detection
-- **C7:** Role-gated admin subset
-
-## Status
-
-🚧 Pre-alpha — scaffold. See [`docs/DESIGN.md`](https://github.com/PharosVPN/docs/blob/main/DESIGN.md) §3 for the platform architecture.
+- `app/` — the Android app (Compose Material3, Android `VpnService`, Keystore)
+  - `model/` — `.pharos` parsing + the on-disk profile store (cloud-sync §2/§5),
+    region→coord table, the map model
+  - `core/` — `CoreBridge` (the seam onto the gomobile `.aar`) + `SecureStore`
+    (Keystore-backed `EncryptedSharedPreferences` for the account passphrase)
+  - `vpn/` — `CaravelVpnService` (owns the TUN, runs the Go engine over the fd) +
+    `TunnelBus` (in-process status/stats stream)
+  - `ui/` — the Compose UI: the signature `LandMap` canvas, the profile list,
+    the controller card, the connect detail, the sign-in sheet
+- `app/libs/caravel.aar` — the gomobile-built Go engine (rebuildable, gitignored)
 
 ## Build
 
-(To be filled in once C1 architecture is locked.)
+Uses the Android SDK at `~/Library/Android/sdk` and Android Studio's bundled JDK.
+
+```sh
+# 1) build the Go engine and drop it into app/libs (one time, and when go/ changes)
+cd ../caravel && ./build-bindings.sh android
+cp dist/caravel.aar ../caravel-android/app/libs/caravel.aar
+
+# 2) build the debug APK
+cd ../caravel-android
+JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" \
+  ./gradlew :app:assembleDebug
+# → app/build/outputs/apk/debug/app-debug.apk  (sideloadable)
+```
+
+See [`NOTES.md`](./NOTES.md) for the current engine-surface gap and exactly which
+features are live today vs. waiting on the full `core` package.
+
+## Status
+
+Working debug APK: the map, file import, profile list (plaintext bundles parsed
+natively), the controller pin, theme, and icon are live. Cloud sync, controller
+reachability, and the tunnel itself light up when the engine `.aar` grows the
+full `core` surface — see [`NOTES.md`](./NOTES.md) (no app changes needed).
 
 ## License
 

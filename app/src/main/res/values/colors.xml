@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<!-- Copyright (C) 2026 The PharosVPN Authors -->
+<resources>
+    <!-- Brand palette (matches caravel-mac + the website). -->
+    <color name="maroon">#5A1F2B</color>
+    <color name="cream">#F4EBDD</color>
+    <color name="teal">#4FD1C4</color>
+    <!-- Deep-ocean app background (LandMap's darkest stop). -->
+    <color name="ocean">#080B12</color>
+</resources>
