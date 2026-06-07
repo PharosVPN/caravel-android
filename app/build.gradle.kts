@@ -8,6 +8,11 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
+// Single source of truth for the version: the repo-root VERSION file (bare
+// semver, e.g. "0.1.0"). Bump it with scripts/bump-version.sh. Read at
+// configuration time so the APK's versionName always matches the release tag.
+val appVersion = rootProject.file("VERSION").readText().trim()
+
 android {
     namespace = "org.pharosvpn.caravel"
     compileSdk = 36
@@ -17,7 +22,7 @@ android {
         minSdk = 26
         targetSdk = 36
         versionCode = 1
-        versionName = "0.1.0"
+        versionName = appVersion
     }
 
     buildTypes {
