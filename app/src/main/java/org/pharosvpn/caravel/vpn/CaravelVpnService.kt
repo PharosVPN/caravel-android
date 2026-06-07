@@ -24,8 +24,7 @@ import kotlinx.coroutines.launch
 import org.pharosvpn.caravel.MainActivity
 import org.pharosvpn.caravel.R
 import org.pharosvpn.caravel.core.CoreBridge
-import org.pharosvpn.caravel.model.ProfileInfo
-import org.pharosvpn.caravel.model.ProfileStore
+import org.json.JSONObject
 
 /**
  * CaravelVpnService owns the Android TUN and runs the Go engine over it. On
@@ -67,11 +66,10 @@ class CaravelVpnService : VpnService() {
 
         scope.launch {
             try {
-                val store = ProfileStore(filesDir)
-                val info = store.list().firstOrNull { it.bundle == bundle && it.profileName == profileName }
-                    ?: store.list().firstOrNull { it.bundle == bundle }
-
-                val pfd = buildTun(info)
+                // The engine resolves the profile's network parameters (address /
+                // routes / mtu / dns); the TUN is built from those, not guesses.
+                val params = runCatching { CoreBridge.prepare(bundle, profileName, proto) }.getOrNull()
+                val pfd = buildTun(params)
                 tun = pfd
 
                 // Hand the fd to the Go engine. It runs the userspace AmneziaWG /
@@ -93,25 +91,44 @@ class CaravelVpnService : VpnService() {
         }
     }
 
-    /** Build the TUN from the selected profile (sane defaults; full route). */
-    private fun buildTun(info: ProfileInfo?): ParcelFileDescriptor {
-        val b = Builder()
-            .setSession("PharosVPN")
-            .setMtu(1420)
-            .addAddress("10.86.0.2", 32)
-            .addRoute("0.0.0.0", 0)
-            .addRoute("::", 0)
-            .addDnsServer("1.1.1.1")
-            .addDnsServer("9.9.9.9")
-            .setBlocking(true)
-        // Keep our own traffic out of the tunnel so the engine's outer packets to
-        // the node reach the network (otherwise they'd route into the TUN).
+    /** Build the TUN from the engine's resolved network parameters (JSON from
+     *  CoreBridge.prepare: address / routes / mtu / dns), falling back to sane
+     *  defaults if the engine couldn't be queried. */
+    private fun buildTun(paramsJson: String?): ParcelFileDescriptor {
+        val o = paramsJson?.let { runCatching { JSONObject(it) }.getOrNull() }
+        val mtu = o?.optInt("mtu", 1420) ?: 1420
+        val address = o?.optString("address").orEmpty().ifEmpty { "10.86.0.2" }
+        val b = Builder().setSession("PharosVPN").setMtu(mtu).setBlocking(true)
+        // Tunnel address (the engine assigns a /32 from the fleet subnet).
+        b.addAddress(address.substringBefore('/'),
+            address.substringAfter('/', "32").toIntOrNull() ?: 32)
+        // Routes — default full tunnel (v4 + v6).
+        val routes = o?.optJSONArray("routes")
+        if (routes != null && routes.length() > 0) {
+            for (i in 0 until routes.length()) {
+                val cidr = routes.optString(i)
+                val ip = cidr.substringBefore('/')
+                val prefix = cidr.substringAfter('/', "").toIntOrNull()
+                    ?: if (ip.contains(':')) 128 else 0
+                runCatching { b.addRoute(ip, prefix) }
+            }
+        } else {
+            b.addRoute("0.0.0.0", 0); b.addRoute("::", 0)
+        }
+        // DNS.
+        val dns = o?.optJSONArray("dns")
+        if (dns != null && dns.length() > 0) {
+            for (i in 0 until dns.length()) runCatching { b.addDnsServer(dns.optString(i)) }
+        } else {
+            b.addDnsServer("1.1.1.1")
+        }
+        // Keep our own traffic — incl. the engine's outer packets to the node —
+        // out of the TUN (the in-process socket-protection trick).
         runCatching { b.addDisallowedApplication(packageName) }
-        val configureIntent = PendingIntent.getActivity(
+        b.setConfigureIntent(PendingIntent.getActivity(
             this, 0, Intent(this, MainActivity::class.java),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-        )
-        b.setConfigureIntent(configureIntent)
+        ))
         return b.establish() ?: error("could not establish the TUN (permission revoked?)")
     }
 

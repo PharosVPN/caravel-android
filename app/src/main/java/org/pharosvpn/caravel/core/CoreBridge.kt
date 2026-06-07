@@ -99,6 +99,15 @@ object CoreBridge {
     }
 
     /**
+     * Network parameters for a profile (JSON {address,mtu,dns,routes,endpoint,
+     * proto}) — what the VpnService needs to build the TUN before connect.
+     */
+    @Throws(EngineUnavailable::class)
+    fun prepare(bundleName: String, profileName: String, protoPref: String): String =
+        require("prepare", String::class.java, String::class.java, String::class.java)
+            .invoke(null, bundleName, profileName, protoPref) as String
+
+    /**
      * Bring up the tunnel over [tunFd] and return an opaque Session handle. The
      * Session is reflected too (stats()/stop()). protoPref is auto|amneziawg|xray.
      */
