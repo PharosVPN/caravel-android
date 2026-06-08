@@ -177,6 +177,30 @@ class CaravelViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    /** Redeem a `pharosvpn://enroll` join link — no passphrase. The engine
+     *  generates the device key on-device, claims the one-time ticket, and stores
+     *  the per-device-sealed profile (replace-all + sidecars, like sync). Re-sync
+     *  for an enrolled device is cert-based, so nothing is stored in SecureStore. */
+    fun enrollFromLink(link: String, deviceName: String, platform: String = "android") =
+        viewModelScope.launch {
+            _ui.update { it.copy(syncing = true, lastError = null) }
+            try {
+                val name = withContext(Dispatchers.IO) {
+                    CoreBridge.enroll(link, deviceName, platform)
+                }
+                _ui.update { it.copy(syncing = false) }
+                reloadProfiles() // refreshes loggedIn from SecureStore (reality)
+                _ui.update { s ->
+                    val first = s.profiles.firstOrNull { it.bundle == name }
+                    s.copy(selectedId = first?.id ?: s.selectedId)
+                }
+            } catch (e: CoreBridge.EngineUnavailable) {
+                _ui.update { it.copy(syncing = false, lastError = "Enrollment needs the full engine — rebuild caravel.aar.") }
+            } catch (e: Throwable) {
+                _ui.update { it.copy(syncing = false, lastError = "enrollment failed: ${e.message}") }
+            }
+        }
+
     fun logout() = viewModelScope.launch {
         withContext(Dispatchers.IO) {
             runCatching { CoreBridge.logout() } // engine purge if available

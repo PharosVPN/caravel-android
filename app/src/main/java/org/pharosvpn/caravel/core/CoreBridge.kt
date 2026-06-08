@@ -18,6 +18,7 @@ import java.lang.reflect.Method
  *   Core.initStore(dir)
  *   Core.importBundle(path) -> name
  *   Core.syncAndStore(pharosidBytes, email, pass) -> name   // login/sync; replace-all
+ *   Core.enroll(link, deviceName, platform) -> name         // join-link; no passphrase
  *   Core.listProfiles() -> JSON
  *   Core.controllerStatus(bundleName) -> JSON
  *   Core.reachable(pharosidBytes, timeoutMs) -> bool
@@ -74,6 +75,14 @@ object CoreBridge {
     fun syncAndStore(pharosId: ByteArray, email: String, password: String): String =
         require("syncAndStore", ByteArray::class.java, String::class.java, String::class.java)
             .invoke(null, pharosId, email, password) as String
+
+    /** Redeem a `pharosvpn://enroll` join link (no passphrase) — the engine
+     *  generates the device key on-device, claims the one-time ticket, and stores
+     *  the per-device-sealed profile. Returns the stored name. */
+    @Throws(EngineUnavailable::class)
+    fun enroll(link: String, deviceName: String, platform: String): String =
+        require("enroll", String::class.java, String::class.java, String::class.java)
+            .invoke(null, link, deviceName, platform) as String
 
     /** Engine's view of the profile list (JSON). */
     @Throws(EngineUnavailable::class)

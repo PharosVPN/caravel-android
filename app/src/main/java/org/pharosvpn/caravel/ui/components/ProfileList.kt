@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.PlayArrow
@@ -65,6 +66,7 @@ fun ProfileList(
     vm: CaravelViewModel,
     onPickBundle: () -> Unit,
     onSignIn: () -> Unit,
+    onEnroll: () -> Unit,
 ) {
     val ui by vm.ui.collectAsState()
     val context = LocalContext.current
@@ -103,6 +105,9 @@ fun ProfileList(
             }
             IconButton(onClick = { devicePicker.launch(arrayOf("*/*")) }, modifier = Modifier.size(34.dp)) {
                 Icon(Icons.Filled.CloudDownload, contentDescription = "Get from controller", tint = Teal)
+            }
+            IconButton(onClick = onEnroll, modifier = Modifier.size(34.dp)) {
+                Icon(Icons.Filled.Link, contentDescription = "Enroll with a join link", tint = Teal)
             }
         }
 

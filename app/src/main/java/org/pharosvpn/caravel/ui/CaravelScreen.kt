@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import org.pharosvpn.caravel.ui.components.ControllerCard
 import org.pharosvpn.caravel.ui.components.DetailPanel
 import org.pharosvpn.caravel.ui.components.ProfileList
+import org.pharosvpn.caravel.ui.components.EnrollSheet
 import org.pharosvpn.caravel.ui.components.SignInSheet
 import org.pharosvpn.caravel.ui.components.TopBrandBar
 import org.pharosvpn.caravel.ui.map.LandMap
@@ -53,6 +54,7 @@ fun CaravelScreen(
 
     val connected = tunnel.status == TunnelBus.Status.Connected
     var showSignIn by remember { mutableStateOf(false) }
+    var showEnroll by remember { mutableStateOf(false) }
 
     // A device file was opened/picked → open the sign-in sheet automatically.
     if (pendingDevice != null && !showSignIn) {
@@ -97,6 +99,7 @@ fun CaravelScreen(
                         vm = vm,
                         onPickBundle = { showSignIn = false },
                         onSignIn = { showSignIn = true },
+                        onEnroll = { showEnroll = true },
                     )
 
                     if (ui.controller != null || ui.loggedIn) {
@@ -126,6 +129,13 @@ fun CaravelScreen(
                 showSignIn = false
                 vm.clearPendingDevice()
             },
+        )
+    }
+
+    if (showEnroll) {
+        EnrollSheet(
+            vm = vm,
+            onDismiss = { showEnroll = false },
         )
     }
 }
