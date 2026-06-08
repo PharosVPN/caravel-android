@@ -47,10 +47,11 @@ features are live today vs. waiting on the full `core` package.
 
 ## Status
 
-Working debug APK: the map, file import, profile list (plaintext bundles parsed
-natively), the controller pin, theme, and icon are live. Cloud sync, controller
-reachability, and the tunnel itself light up when the engine `.aar` grows the
-full `core` surface — see [`NOTES.md`](./NOTES.md) (no app changes needed).
+Pre-alpha sideloadable debug APK (not Play-signed). The map, file import, and
+profile list (plaintext bundles parsed natively), the controller pin, theme, and
+icon are live. Cloud sync, controller reachability, and the tunnel itself light
+up when the engine `.aar` grows the full `core` surface — see
+[`NOTES.md`](./NOTES.md) (no app changes needed).
 
 ## License
 
